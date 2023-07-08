@@ -1,8 +1,14 @@
-import {Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/common';
 import { UsersService } from '../service/users.service';
 import {User} from "../entity/user.entity";
 import {CreateUserDto} from "../dto/createUser.dto";
 
+type findOneRequestQuery = {
+    id: number | null,
+    email: string | null,
+    phone: string | null,
+    name: string | null
+}
 @Controller('/users')
 export class UsersController {
     constructor(private readonly userService: UsersService) {}
@@ -15,6 +21,12 @@ export class UsersController {
     @Get(':id')
     findOne(@Param('id')id: string): string {
         return `This action returns a #${id} user`;
+    }
+
+    @Get('/email/duplication')
+    findOneByEmail(@Query() query: findOneRequestQuery): Promise<User> {
+        console.log(query.email)
+        return this.userService.findOneByEmail(query.email);
     }
 
     @Post()
