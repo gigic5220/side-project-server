@@ -2,6 +2,7 @@ import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/co
 import { UsersService } from '../service/users.service';
 import {User} from "../entity/user.entity";
 import {CreateUserDto} from "../dto/createUser.dto";
+import {ResponseDto} from "../dto/response.dto";
 
 type findOneRequestQuery = {
     id: number | null,
@@ -14,8 +15,8 @@ export class UsersController {
     constructor(private readonly userService: UsersService) {}
 
     @Get()
-    findAll(): Promise<User[]> {
-        return this.userService.findAll();
+    findAll(): ResponseDto<Promise<User[]>> {
+        return new ResponseDto(this.userService.findAll(), true, 200, 'success');
     }
 
     @Get(':id')
@@ -24,15 +25,14 @@ export class UsersController {
     }
 
     @Get('/email/duplication')
-    findOneByEmail(@Query() query: findOneRequestQuery): Promise<User> {
-        console.log(query.email)
-        return this.userService.findOneByEmail(query.email);
+    async findOneByEmail(@Query() query: findOneRequestQuery): Promise<ResponseDto<User>> {
+        const user = await this.userService.findOneByEmail(query.email)
+        return new ResponseDto(user, true, 200, 'success')
     }
 
     @Post()
-    create(@Body() dto: CreateUserDto){
-        console.log('dto', dto)
-        return this.userService.create(dto);
+    create(@Body() dto: CreateUserDto): ResponseDto<Promise<void>>{
+        return new ResponseDto(this.userService.create(dto), true, 200, 'success');
     }
 
     @Delete(':id')

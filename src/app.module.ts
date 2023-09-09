@@ -1,28 +1,34 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule} from "@nestjs/config";
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {User} from "./entity/user.entity";
 import {UsersModule} from "./module/users.module";
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import {VerifyModule} from "./module/verify.module";
 
 @Module({
   imports: [
       ConfigModule.forRoot({
-          cache: true,
-          isGlobal: true
+          isGlobal: true,
+          envFilePath: `.env.${process.env.NODE_ENV}`,
       }),
-      TypeOrmModule.forRoot({
-          type: 'mysql',
-          host: 'localhost',
-          port: 3306,
-          username: 'root',
-          password: 'rootroot',
-          database: 'side-project',
-          entities: [User],
-          synchronize: true,
+      TypeOrmModule.forRootAsync({
+          imports: [ConfigModule],
+          useFactory: (configService: ConfigService) => ({
+              type: 'mysql',
+              host: configService.get('DATABASE_HOST'),
+              port: +configService.get<number>('DATABASE_PORT'),
+              username: configService.get('DATABASE_USERNAME'),
+              password: configService.get('DATABASE_PASSWORD'),
+              database: configService.get('DATABASE_NAME'),
+              entities: [User],
+              synchronize: true,
+          }),
+          inject: [ConfigService],
       }),
-      UsersModule
+      UsersModule,
+      VerifyModule
   ],
   controllers: [AppController],
   providers: [AppService],
