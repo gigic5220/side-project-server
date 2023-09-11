@@ -3,13 +3,9 @@ import { UsersService } from '../service/users.service';
 import {User} from "../entity/user.entity";
 import {CreateUserDto} from "../dto/createUser.dto";
 import {ResponseDto} from "../dto/response.dto";
+import {EmailDuplicationDto} from "../dto/emailDuplication.dto";
+import {PhoneDuplicationDto} from "../dto/phoneDuplication.dto";
 
-type findOneRequestQuery = {
-    id: number | null,
-    email: string | null,
-    phone: string | null,
-    name: string | null
-}
 @Controller('/users')
 export class UsersController {
     constructor(private readonly userService: UsersService) {}
@@ -24,9 +20,15 @@ export class UsersController {
         return `This action returns a #${id} user`;
     }
 
-    @Get('/email/duplication')
-    async findOneByEmail(@Query() query: findOneRequestQuery): Promise<ResponseDto<User>> {
-        const user = await this.userService.findOneByEmail(query.email)
+    @Post('/email/duplication')
+    async findOneByEmail(@Body() dto: EmailDuplicationDto): Promise<ResponseDto<User>> {
+        const user = await this.userService.findOneByEmail(dto.email)
+        return new ResponseDto(user, true, 200, 'success')
+    }
+
+    @Post('/phone/duplication')
+    async findOneByPhone(@Body() dto: PhoneDuplicationDto): Promise<ResponseDto<User>> {
+        const user = await this.userService.findOneByPhone(dto.phone)
         return new ResponseDto(user, true, 200, 'success')
     }
 

@@ -1,3 +1,4 @@
 export class VerifyDto {
-    number: string;
+    phone: string;
+    code: string;
 }

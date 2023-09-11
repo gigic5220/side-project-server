@@ -22,6 +22,10 @@ export class UsersService {
         return this.usersRepository.findOneBy({ email });
     }
 
+    findOneByPhone(phone: string): Promise<User | null> {
+        return this.usersRepository.findOneBy({ phone });
+    }
+
     async create(dto: CreateUserDto): Promise<void> {
         await this.usersRepository.save(dto);
     }
