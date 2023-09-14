@@ -6,6 +6,7 @@ import {User} from "./entity/user.entity";
 import {UsersModule} from "./module/users.module";
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {VerifyModule} from "./module/verify.module";
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -28,9 +29,11 @@ import {VerifyModule} from "./module/verify.module";
           inject: [ConfigService],
       }),
       UsersModule,
-      VerifyModule
+      VerifyModule,
+      AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+
