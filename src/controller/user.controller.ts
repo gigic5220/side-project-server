@@ -1,5 +1,5 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/common';
-import { UsersService } from '../service/users.service';
+import {Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards} from '@nestjs/common';
+import { UserService } from '../service/user.service';
 import {User} from "../entity/user.entity";
 import {CreateUserDto} from "../dto/createUser.dto";
 import {ResponseDto} from "../dto/response.dto";
@@ -7,17 +7,20 @@ import {UserIdDuplicationDto} from "../dto/userIdDuplication.dto";
 import {PhoneDuplicationDto} from "../dto/phoneDuplication.dto";
 import {LoginRequestDto} from "../dto/loginRequest.dto";
 import {AuthService} from "../auth/auth.service";
+import {AuthGuard} from "@nestjs/passport";
 
-@Controller('/users')
-export class UsersController {
+@Controller('/user')
+export class UserController {
     constructor(
-        private readonly userService: UsersService,
+        private readonly userService: UserService,
         private readonly authService: AuthService,  // 의존성 주입
     ) {}
 
+    @UseGuards(AuthGuard('jwt'))
     @Get()
-    findAll(): ResponseDto<Promise<User[]>> {
-        return new ResponseDto(this.userService.findAll(), true, 200, 'success');
+    async findAll(): Promise<ResponseDto<User[]>> {
+        const userList = await this.userService.findAll()
+        return new ResponseDto(userList, true, 200, 'success');
     }
 
     @Get(':id')

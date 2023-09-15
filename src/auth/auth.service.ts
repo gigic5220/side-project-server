@@ -1,36 +1,60 @@
 import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {LoginRequestDto} from "../dto/loginRequest.dto";
 import {JwtService} from "@nestjs/jwt";
-import * as bcrypt from 'bcrypt';
+import { UserService } from '../service/user.service';
 import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "../entity/user.entity";
 import {Repository} from "typeorm";
+import {TokenService} from "../service/token.service";
+import {ConfigService} from "@nestjs/config";
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(User)
-        private usersRepository: Repository<User>,
-        private readonly jwtService: JwtService,  // auth.module의 JwtModule로부터 공급 받음
+        private userRepository: Repository<User>,
+        private readonly jwtService: JwtService,
+        private userService: UserService,
+        private tokenService: TokenService,
+        private readonly configService: ConfigService,
     ) {}
 
     async jwtLogin(data: LoginRequestDto) {
         const { userId, password } = data;
-        const user = await this.usersRepository.findOneBy({ userId });
+        const user = await this.userRepository.findOneBy({ userId });
         if (!user) {
-            throw new UnauthorizedException('이메일과 비밀번호를 확인해주세요.');
+            throw new UnauthorizedException('아이디와 비밀번호를 확인해 주세요');
         }
-        const isPasswordValidated: boolean = await bcrypt.compare(
-            password,
-            user.password,
-        );
-        if (!isPasswordValidated) {
-            console.log('isPasswordValidated', isPasswordValidated)
-            throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+
+        const isPasswordMatch = await this.userService.comparePasswords(password, user.password)
+
+        if (!isPasswordMatch) {
+            throw new UnauthorizedException('비밀번호가 일치하지 않습니다');
         }
-        const payload = { userId, sub: user.userId };
+        const accessTokenPayload = { sub: user.userId, type: 'access' };
+        const refreshTokenPayload = { sub: user.userId, type: 'access' };
+
+        const accessToken = this.jwtService.sign(accessTokenPayload,{ expiresIn: '5s', secret: this.configService.get('JWT_SECRET_KEY') });
+
+        const nowInMilliseconds = new Date().getTime()
+
+        //now.setMilliseconds(now.getMilliseconds() + 5 * 60 * 1000)
+
+        const accessTokenExpireAt = nowInMilliseconds + 5 * 1000
+        const refreshToken = this.jwtService.sign(refreshTokenPayload,{ expiresIn: '30d', secret: this.configService.get('JWT_SECRET_KEY') });
+
+        await this.tokenService.create({
+            refreshToken: refreshToken,
+            userId: user.id
+        })
+
         return {
-            token: this.jwtService.sign(payload),
+            id: user.id,
+            userId: user.userId,
+            isActive: user.isActive,
+            accessToken: accessToken,
+            accessTokenExpireAt: accessTokenExpireAt,
+            refreshToken: refreshToken,
         };
     }
 }

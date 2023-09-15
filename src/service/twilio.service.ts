@@ -15,12 +15,7 @@ export class TwilioService {
         this.accountSid = this.configService.get('TWILIO_ACCOUNT_SID');
         this.authToken = this.configService.get('TWILIO_AUTH_TOKEN');
         this.verifyServiceSid = this.configService.get('TWILIO_VERIFY_SERVICE_SID');
-
-        console.log(this.verifyServiceSid)
-
-
         this.client = require('twilio')(accountSid, authToken);
-        console.log('this.client', this.client)
     }
 
     sendVerificationCode(options: { to: string }) {

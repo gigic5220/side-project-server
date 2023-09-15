@@ -3,10 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {User} from "./entity/user.entity";
-import {UsersModule} from "./module/users.module";
+import {UserModule} from "./module/user.module";
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {VerifyModule} from "./module/verify.module";
 import { AuthModule } from './auth/auth.module';
+import {RefreshToken} from "./entity/refreshToken.entity";
+import {TokenModule} from "./module/token.module";
 
 @Module({
   imports: [
@@ -23,14 +25,15 @@ import { AuthModule } from './auth/auth.module';
               username: configService.get('DATABASE_USERNAME'),
               password: configService.get('DATABASE_PASSWORD'),
               database: configService.get('DATABASE_NAME'),
-              entities: [User],
+              entities: [User, RefreshToken],
               synchronize: true,
           }),
           inject: [ConfigService],
       }),
-      UsersModule,
+      UserModule,
       VerifyModule,
-      AuthModule
+      AuthModule,
+      TokenModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -3,8 +3,10 @@ import { AuthService } from './auth.service';
 import {JwtStrategy} from "./jwt/jwt.strategy";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import {PassportModule} from "@nestjs/passport";
-import {JwtModule} from "@nestjs/jwt";
-import {UsersModule} from "../module/users.module";
+import {JwtModule, JwtService} from "@nestjs/jwt";
+import {UserModule} from "../module/user.module";
+import {TokenService} from "../service/token.service";
+import {TokenModule} from "../module/token.module";
 
 @Module({
   imports: [
@@ -18,9 +20,10 @@ import {UsersModule} from "../module/users.module";
       }),
       inject: [ConfigService],
     }),
-    forwardRef(() => UsersModule),
+    forwardRef(() => UserModule),
+      TokenModule
   ],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
+  providers: [TokenService, AuthService, JwtStrategy, JwtService],
+  exports: [AuthService, JwtService],
 })
 export class AuthModule {}
