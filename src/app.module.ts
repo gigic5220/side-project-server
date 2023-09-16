@@ -3,13 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {User} from "./entity/user.entity";
+import {File} from "./entity/file.entity";
 import {UserModule} from "./module/user.module";
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {VerifyModule} from "./module/verify.module";
 import { AuthModule } from './auth/auth.module';
 import {RefreshToken} from "./entity/refreshToken.entity";
 import {TokenModule} from "./module/token.module";
-import { UploadsModule } from './module/uploads.module';
+import { UploadModule } from './module/upload.module';
+import { FileModule } from './module/file.module';
 
 @Module({
   imports: [
@@ -26,7 +28,7 @@ import { UploadsModule } from './module/uploads.module';
               username: configService.get('DATABASE_USERNAME'),
               password: configService.get('DATABASE_PASSWORD'),
               database: configService.get('DATABASE_NAME'),
-              entities: [User, RefreshToken],
+              entities: [User, RefreshToken, File],
               synchronize: true,
           }),
           inject: [ConfigService],
@@ -35,7 +37,8 @@ import { UploadsModule } from './module/uploads.module';
       VerifyModule,
       AuthModule,
       TokenModule,
-      UploadsModule
+      UploadModule,
+      FileModule
   ],
   controllers: [AppController],
   providers: [AppService],

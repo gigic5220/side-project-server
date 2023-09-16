@@ -2,17 +2,17 @@ import { Controller, Post, UploadedFile, UseInterceptors, HttpException, HttpSta
 import { FileInterceptor } from "@nestjs/platform-express";
 import {ResponseDto} from "../dto/response.dto";
 import {UploadFileResponseDto} from "../dto/uploadFileResponseDto";
-import {UploadsService} from "../service/upload.service";
+import {UploadService} from "../service/upload.service";
 
-@Controller('uploads')
-export class UploadsController {
-    constructor(private readonly uploadsService: UploadsService) {}
+@Controller('upload')
+export class UploadController {
+    constructor(private readonly uploadService: UploadService) {}
 
     @Post('')
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@UploadedFile() file): Promise<ResponseDto<UploadFileResponseDto>> {
         try {
-            const url = await this.uploadsService.upload(file);
+            const url = await this.uploadService.upload(file);
             const uploadFileResponseDto = new UploadFileResponseDto(url);
             return new ResponseDto(uploadFileResponseDto, true, 200, 'success');
         } catch (error) {

@@ -3,7 +3,7 @@ import {Injectable, UploadedFile} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()
-export class UploadsService {
+export class UploadService {
     private s3: AWS.S3;
     private BUCKET_NAME: string;
     constructor(private configService: ConfigService) {
