@@ -9,6 +9,7 @@ import {VerifyModule} from "./module/verify.module";
 import { AuthModule } from './auth/auth.module';
 import {RefreshToken} from "./entity/refreshToken.entity";
 import {TokenModule} from "./module/token.module";
+import { UploadsModule } from './module/uploads.module';
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import {TokenModule} from "./module/token.module";
       UserModule,
       VerifyModule,
       AuthModule,
-      TokenModule
+      TokenModule,
+      UploadsModule
   ],
   controllers: [AppController],
   providers: [AppService],

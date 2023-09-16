@@ -29,19 +29,19 @@ export class AuthService {
         const isPasswordMatch = await this.userService.comparePasswords(password, user.password)
 
         if (!isPasswordMatch) {
-            throw new UnauthorizedException('비밀번호가 일치하지 않습니다');
+            throw new UnauthorizedException('아이디와 비밀번호를 확인해 주세요');
         }
         const accessTokenPayload = { sub: user.userId, type: 'access' };
         const refreshTokenPayload = { sub: user.userId, type: 'access' };
 
-        const accessToken = this.jwtService.sign(accessTokenPayload,{ expiresIn: '5s', secret: this.configService.get('JWT_SECRET_KEY') });
+        const accessToken = this.jwtService.sign(accessTokenPayload,{ expiresIn: '2s', secret: this.configService.get('JWT_SECRET_KEY') });
 
         const nowInMilliseconds = new Date().getTime()
 
         //now.setMilliseconds(now.getMilliseconds() + 5 * 60 * 1000)
 
         const accessTokenExpireAt = nowInMilliseconds + 5 * 1000
-        const refreshToken = this.jwtService.sign(refreshTokenPayload,{ expiresIn: '30d', secret: this.configService.get('JWT_SECRET_KEY') });
+        const refreshToken = this.jwtService.sign(refreshTokenPayload,{ expiresIn: '5s', secret: this.configService.get('JWT_SECRET_KEY') });
 
         await this.tokenService.create({
             refreshToken: refreshToken,
