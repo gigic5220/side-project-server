@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards} from '@nestjs/common';
+import { Body, ConflictException, Controller, Get, InternalServerErrorException, Post, Req, UseGuards } from '@nestjs/common';
 import { UserService } from '../service/user.service';
 import {User} from "../entity/user.entity";
 import {CreateUserDto} from "../dto/createUser.dto";
@@ -8,6 +8,7 @@ import {PhoneDuplicationDto} from "../dto/phoneDuplication.dto";
 import {LoginRequestDto} from "../dto/loginRequest.dto";
 import {AuthService} from "../auth/auth.service";
 import {AuthGuard} from "@nestjs/passport";
+import {Request} from "express";
 
 @Controller('/user')
 export class UserController {
@@ -23,11 +24,6 @@ export class UserController {
         return new ResponseDto(userList, true, 200, 'success');
     }
 
-    @Get(':id')
-    findOne(@Param('id')id: string): string {
-        return `This action returns a #${id} user`;
-    }
-
     @Post('/userId/duplication')
     async findOneByUserId(@Body() dto: UserIdDuplicationDto): Promise<ResponseDto<boolean>> {
         const user = await this.userService.findOneByUserId(dto.userId)
@@ -41,18 +37,26 @@ export class UserController {
     }
 
     @Post()
-    create(@Body() dto: CreateUserDto): ResponseDto<Promise<void>>{
-        return new ResponseDto(this.userService.create(dto), true, 200, 'success');
-    }
-
-    @Delete(':id')
-    async remove(@Param('id')id: number){
-        await this.userService.remove(id);
-        return `This action removes a #${id} cat`;
+    async create(@Body() dto: CreateUserDto): Promise<ResponseDto<void>>{
+        try {
+            await this.userService.create(dto)
+            return new ResponseDto(null, true, 200, 'success');
+        } catch (error) {
+            if (error.code === 'ER_DUP_ENTRY' || error.errno === 1062) {
+                throw new ConflictException('이미 가입된 아이디입니다');
+            } else {
+                throw new InternalServerErrorException('서버오류입니다');
+            }
+        }
     }
 
     @Post('/login')
     logIn(@Body() data: LoginRequestDto) {
         return this.authService.jwtLogin(data);
+    }
+
+    @Get('/current')
+    async findOneByAccessToken(@Req() request: Request): Promise<ResponseDto<User>> {
+        return new ResponseDto(await this.authService.getUserFromAccessToken(request), true, 200, 'success')
     }
 }

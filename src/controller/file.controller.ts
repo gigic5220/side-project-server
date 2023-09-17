@@ -18,9 +18,8 @@ export class FileController {
         @Query('type') type: string,
         @Req() request: Request
     ): Promise<ResponseDto<File>> {
-        console.log('type', type)
-        const userId = await this.authService.getIdFromAccessToken(request)
-        return new ResponseDto(await this.fileService.findOne(userId, type), true, 200, 'success')
+        const user = await this.authService.getUserFromAccessToken(request)
+        return new ResponseDto(await this.fileService.findOne(user?.id, type), true, 200, 'success')
     }
 
     @Post()
@@ -28,7 +27,8 @@ export class FileController {
         @Body() dto: CreateFileDto,
         @Req() request: Request
     ): Promise<ResponseDto<void>>{
-        dto.userId = await this.authService.getIdFromAccessToken(request)
+        const user =  await this.authService.getUserFromAccessToken(request)
+        dto.userId = user.id
         return new ResponseDto(await this.fileService.create(dto), true, 200, 'success');
     }
 

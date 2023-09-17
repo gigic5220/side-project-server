@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
@@ -13,7 +13,7 @@ export class UserService {
     ) {}
 
     async hashPassword(password: string): Promise<string> {
-        const saltOrRounds = 10; // 일반적으로 사용되는 라운드 수
+        const saltOrRounds = 10;
         return await bcrypt.hash(password, saltOrRounds);
     }
 
@@ -28,6 +28,7 @@ export class UserService {
     findOneById(id: number): Promise<User | null> {
         return this.userRepository.findOneBy({ id });
     }
+
     findOneByUserId(userId: string): Promise<User | null> {
         return this.userRepository.findOneBy({ userId });
     }
@@ -37,7 +38,11 @@ export class UserService {
     }
 
     async create(dto: CreateUserDto): Promise<void> {
-        dto.password = await this.hashPassword(dto.password)
+        if (dto.provider === 'kakao') {
+            dto.isActive = false
+        } else {
+            dto.password = await this.hashPassword(dto.password)
+        }
         await this.userRepository.save(dto);
     }
 

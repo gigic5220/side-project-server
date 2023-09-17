@@ -5,6 +5,7 @@ import { UserService } from '../service/user.service';
 import {TokenService} from "../service/token.service";
 import {ConfigService} from "@nestjs/config";
 import { Request } from 'express';
+import {User} from "../entity/user.entity";
 
 @Injectable()
 export class AuthService {
@@ -15,28 +16,28 @@ export class AuthService {
         private readonly configService: ConfigService,
     ) {}
 
-    async getIdFromAccessToken(request: Request): Promise<number> {
+    async getUserFromAccessToken(request: Request): Promise<User> {
         const accessToken = request.headers['authorization']?.replace('Bearer ','');
         const secret = await this.configService.get('JWT_SECRET_KEY');
         const verifiedAccessToken = this.jwtService.verify(accessToken, {secret: secret});
-        const user = await this.userService.findOneByUserId(verifiedAccessToken.sub)
-        return user?.id
+        return await this.userService.findOneByUserId(verifiedAccessToken.sub)
     }
 
-    async jwtLogin(data: LoginRequestDto) {
-        const { userId, password } = data;
-        const user = await this.userService.findOneByUserId(userId);
+    async jwtLogin(dto: LoginRequestDto) {
+        const user = await this.userService.findOneByUserId(dto.userId);
         if (!user) {
             throw new UnauthorizedException('아이디와 비밀번호를 확인해 주세요');
         }
 
-        const isPasswordMatch = await this.userService.comparePasswords(password, user.password)
-
-        if (!isPasswordMatch) {
-            throw new UnauthorizedException('아이디와 비밀번호를 확인해 주세요');
+        if (dto.provider !== 'kakao') {
+            const isPasswordMatch = await this.userService.comparePasswords(dto.password, user.password)
+            if (!isPasswordMatch) {
+                throw new UnauthorizedException('아이디와 비밀번호를 확인해 주세요');
+            }
         }
+
         const accessTokenPayload = { sub: user.userId, type: 'access' };
-        const refreshTokenPayload = { sub: user.userId, type: 'access' };
+        const refreshTokenPayload = { sub: user.userId, type: 'refresh' };
 
         const accessToken = this.jwtService.sign(accessTokenPayload,{ expiresIn: '30d', secret: this.configService.get('JWT_SECRET_KEY') });
 
