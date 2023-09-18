@@ -1,8 +1,6 @@
 import {Body, Controller, ForbiddenException, Post} from '@nestjs/common';
-import {ResponseDto} from "../dto/response.dto";
 import {TokenService} from "../service/token.service";
 import {RefreshTokenDto} from "../dto/refreshToken.dto";
-import * as jwt from 'jsonwebtoken';
 import {UserService} from "../service/user.service";
 import {ConfigService} from "@nestjs/config";
 import {JwtService} from "@nestjs/jwt";
@@ -21,7 +19,7 @@ export class TokenController {
     ) {}
 
     @Post('/refresh')
-    async create(@Body() dto: RefreshTokenDto): Promise<ResponseDto<{ accessToken: string }>> {
+    async create(@Body() dto: RefreshTokenDto): Promise<{ accessToken: string }> {
         const secret = await this.configService.get('JWT_SECRET_KEY');
         try {
             const verified = this.jwtService.verify(dto.refreshToken, {secret: secret});
@@ -37,7 +35,7 @@ export class TokenController {
             }
 
             const accessToken = this.jwtService.sign({sub: user.userId}, {expiresIn: '5s', secret: secret});
-            return new ResponseDto({accessToken}, true, 200, 'success');
+            return {accessToken};
 
         } catch (error) {
             console.error('Token verification failed:', error.message);

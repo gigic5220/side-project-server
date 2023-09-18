@@ -21,6 +21,12 @@ export class User {
     @Column({nullable: true})
     provider: string;
 
+    @Column({nullable: true})
+    age: string;
+
+    @Column({nullable: true})
+    gender: string;
+
     @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
     refreshTokens: RefreshToken[];
 }

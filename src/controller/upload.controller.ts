@@ -1,7 +1,5 @@
 import { Controller, Post, UploadedFile, UseInterceptors, HttpException, HttpStatus } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import {ResponseDto} from "../dto/response.dto";
-import {UploadFileResponseDto} from "../dto/uploadFileResponseDto";
 import {UploadService} from "../service/upload.service";
 
 @Controller('upload')
@@ -10,11 +8,9 @@ export class UploadController {
 
     @Post('')
     @UseInterceptors(FileInterceptor('file'))
-    async uploadFile(@UploadedFile() file): Promise<ResponseDto<UploadFileResponseDto>> {
+    async uploadFile(@UploadedFile() file): Promise<{ url: string }> {
         try {
-            const url = await this.uploadService.upload(file);
-            const uploadFileResponseDto = new UploadFileResponseDto(url);
-            return new ResponseDto(uploadFileResponseDto, true, 200, 'success');
+            return {url: await this.uploadService.upload(file)};
         } catch (error) {
             throw new HttpException('Failed to upload file', HttpStatus.INTERNAL_SERVER_ERROR);
         }
