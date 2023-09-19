@@ -23,17 +23,17 @@ export class UserController {
     }
 
     @Post('/userId/duplication')
-    async findOneByUserId(@Body() dto: UserIdDuplicationDto): Promise<{ isDuplicated: boolean }> {
+    async getUserIdDuplication(@Body() dto: UserIdDuplicationDto): Promise<{ isDuplicated: boolean }> {
         return {isDuplicated: !!await this.userService.findOneByUserId(dto.userId)}
     }
 
     @Post('/phone/duplication')
-    async findOneByPhone(@Body() dto: PhoneDuplicationDto): Promise<{isDuplicated: boolean}> {
+    async getPhoneDuplication(@Body() dto: PhoneDuplicationDto): Promise<{isDuplicated: boolean}> {
         return {isDuplicated: !!await this.userService.findOneByPhone(dto.phone)}
     }
 
     @Post()
-    async create(@Body() dto: CreateUserDto): Promise<void>{
+    async join(@Body() dto: CreateUserDto): Promise<void>{
         try {
             await this.userService.create(dto)
         } catch (error) {
@@ -51,7 +51,7 @@ export class UserController {
     }
 
     @Get('/current')
-    async findOneByAccessToken(@Req() request: Request): Promise<User> {
+    async getCurrentUser(@Req() request: Request): Promise<User> {
         return await this.authService.getUserFromAccessToken(request)
     }
 }
