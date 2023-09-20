@@ -12,10 +12,10 @@ export class User {
     @Column({nullable: true})
     phone: string;
 
-    @Column({nullable: true, select: false})
+    @Column({nullable: true})
     password: string;
 
-    @Column({ default: true })
+    @Column({ default: false })
     isActive: boolean;
 
     @Column({nullable: true})

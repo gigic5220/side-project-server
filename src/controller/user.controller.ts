@@ -1,4 +1,14 @@
-import { Body, ConflictException, Controller, Get, InternalServerErrorException, Post, Req, UseGuards } from '@nestjs/common';
+import {
+    Body,
+    ConflictException,
+    Controller,
+    Get,
+    InternalServerErrorException,
+    Param,
+    Post, Put,
+    Req,
+    UseGuards
+} from '@nestjs/common';
 import { UserService } from '../service/user.service';
 import {User} from "../entity/user.entity";
 import {CreateUserDto} from "../dto/createUser.dto";
@@ -8,6 +18,7 @@ import {LoginRequestDto} from "../dto/loginRequest.dto";
 import {AuthService} from "../auth/auth.service";
 import {AuthGuard} from "@nestjs/passport";
 import {Request} from "express";
+import {UpdateUserDto} from "../dto/updateUser.dto";
 
 @Controller('/user')
 export class UserController {
@@ -22,18 +33,8 @@ export class UserController {
         return await this.userService.findAll()
     }
 
-    @Post('/userId/duplication')
-    async getUserIdDuplication(@Body() dto: UserIdDuplicationDto): Promise<{ isDuplicated: boolean }> {
-        return {isDuplicated: !!await this.userService.findOneByUserId(dto.userId)}
-    }
-
-    @Post('/phone/duplication')
-    async getPhoneDuplication(@Body() dto: PhoneDuplicationDto): Promise<{isDuplicated: boolean}> {
-        return {isDuplicated: !!await this.userService.findOneByPhone(dto.phone)}
-    }
-
     @Post()
-    async join(@Body() dto: CreateUserDto): Promise<void>{
+    async create(@Body() dto: CreateUserDto): Promise<void>{
         try {
             await this.userService.create(dto)
         } catch (error) {
@@ -45,13 +46,32 @@ export class UserController {
         }
     }
 
-    @Post('/login')
-    logIn(@Body() data: LoginRequestDto) {
-        return this.authService.jwtLogin(data);
+    @Put(':id')
+    async update(@Param('id') id: number, @Body() dto: UpdateUserDto): Promise<void> {
+        await this.userService.update(id, dto)
     }
 
+    @Post('/userId/duplication')
+    async getUserIdDuplication(@Body() dto: UserIdDuplicationDto): Promise<{ isDuplicated: boolean }> {
+        return {isDuplicated: !!await this.userService.findOneByUserId(dto.userId)}
+    }
+
+    @Post('/phone/duplication')
+    async getPhoneDuplication(@Body() dto: PhoneDuplicationDto): Promise<{isDuplicated: boolean}> {
+        return {isDuplicated: !!await this.userService.findOneByPhone(dto.phone)}
+    }
+
+
+
+    @Post('/login')
+    logIn(@Body() data: LoginRequestDto) {
+        console.log('data', data)
+        return this.authService.jwtLogin(data);
+    }
     @Get('/current')
     async getCurrentUser(@Req() request: Request): Promise<User> {
         return await this.authService.getUserFromAccessToken(request)
     }
+
+
 }

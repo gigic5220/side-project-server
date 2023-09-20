@@ -20,7 +20,9 @@ export class AuthService {
         const accessToken = request.headers['authorization']?.replace('Bearer ','');
         const secret = await this.configService.get('JWT_SECRET_KEY');
         const verifiedAccessToken = this.jwtService.verify(accessToken, {secret: secret});
-        return await this.userService.findOneByUserId(verifiedAccessToken.sub)
+        const user = await this.userService.findOneByUserId(verifiedAccessToken.sub)
+        delete user.password
+        return user
     }
 
     async jwtLogin(dto: LoginRequestDto) {
@@ -28,14 +30,12 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException('아이디와 비밀번호를 확인해 주세요');
         }
-
         if (dto.provider !== 'kakao') {
             const isPasswordMatch = await this.userService.comparePasswords(dto.password, user.password)
             if (!isPasswordMatch) {
                 throw new UnauthorizedException('아이디와 비밀번호를 확인해 주세요');
             }
         }
-
         const accessTokenPayload = { sub: user.userId, type: 'access' };
         const refreshTokenPayload = { sub: user.userId, type: 'refresh' };
 

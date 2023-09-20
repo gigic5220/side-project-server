@@ -4,12 +4,15 @@ import { Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
 import {CreateUserDto} from "../dto/createUser.dto";
 import * as bcrypt from 'bcrypt';
+import {UpdateUserDto} from "../dto/updateUser.dto";
+import {FileService} from "./file.service";
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
+        private fileService: FileService
     ) {}
 
     async hashPassword(password: string): Promise<string> {
@@ -45,6 +48,15 @@ export class UserService {
         }
         await this.userRepository.save(dto);
     }
+
+    async update(id: number, dto: UpdateUserDto): Promise<void> {
+        const profileImage = await this.fileService.findOne(id, 'profileImage')
+        if (!!profileImage.url && !!dto.gender && !!dto.age) {
+            dto.isActive = true
+        }
+        await this.userRepository.update(id, dto)
+    }
+
 
     async remove(id: number): Promise<void> {
         await this.userRepository.delete(id);
