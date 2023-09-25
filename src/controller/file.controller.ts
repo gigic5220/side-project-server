@@ -1,9 +1,10 @@
-import {Body, Controller, Get, Param, Post, Query, Req} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Query, Req, UseGuards} from '@nestjs/common';
 import {FileService} from "../service/file.service";
 import {CreateFileDto} from "../dto/createFile.dto";
 import {AuthService} from "../auth/auth.service";
 import { File } from '../entity/file.entity';
 import { Request } from 'express';
+import {AuthGuard} from "@nestjs/passport";
 
 @Controller('/file')
 export class FileController {
@@ -12,6 +13,7 @@ export class FileController {
         private readonly authService: AuthService
     ) {}
 
+    @UseGuards(AuthGuard('jwt'))
     @Get()
     async findOne(
         @Query('type') type: string,

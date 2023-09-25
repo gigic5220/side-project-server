@@ -30,6 +30,7 @@ import { FileModule } from './module/file.module';
               database: configService.get('DATABASE_NAME'),
               entities: [User, RefreshToken, File],
               synchronize: true,
+              logging: true,
           }),
           inject: [ConfigService],
       }),

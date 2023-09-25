@@ -19,6 +19,7 @@ import {AuthService} from "../auth/auth.service";
 import {AuthGuard} from "@nestjs/passport";
 import {Request} from "express";
 import {UpdateUserDto} from "../dto/updateUser.dto";
+import {JwtAuthGuard} from "../auth/jwt/jwt.guard";
 
 @Controller('/user')
 export class UserController {
@@ -68,10 +69,10 @@ export class UserController {
         console.log('data', data)
         return this.authService.jwtLogin(data);
     }
+    @UseGuards(JwtAuthGuard)
     @Get('/current')
     async getCurrentUser(@Req() request: Request): Promise<User> {
         return await this.authService.getUserFromAccessToken(request)
     }
-
 
 }
