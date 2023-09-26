@@ -39,7 +39,7 @@ export class AuthService {
         const accessTokenPayload = { sub: user.userId, type: 'access' };
         const refreshTokenPayload = { sub: user.userId, type: 'refresh' };
 
-        const accessToken = this.jwtService.sign(accessTokenPayload,{ expiresIn: '30d', secret: this.configService.get('JWT_SECRET_KEY') });
+        const accessToken = this.jwtService.sign(accessTokenPayload,{ expiresIn: '1d', secret: this.configService.get('JWT_SECRET_KEY') });
 
         const nowInMilliseconds = new Date().getTime()
 
