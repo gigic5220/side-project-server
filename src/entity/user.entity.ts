@@ -6,26 +6,11 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({unique: true })
-    userId: string;
-
     @Column({nullable: true})
     phone: string;
 
     @Column({nullable: true})
-    password: string;
-
-    @Column({ default: false })
-    isActive: boolean;
-
-    @Column({nullable: true})
     provider: string;
-
-    @Column({nullable: true})
-    age: string;
-
-    @Column({nullable: true})
-    gender: string;
 
     @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
     refreshTokens: RefreshToken[];

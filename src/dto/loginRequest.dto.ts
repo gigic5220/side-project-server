@@ -1,5 +1,5 @@
 export class LoginRequestDto {
-    userId: string;
-    password: string;
+    phone: string;
+    code: string;
     provider: string;
 }

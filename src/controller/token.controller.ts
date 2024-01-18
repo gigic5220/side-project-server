@@ -23,7 +23,7 @@ export class TokenController {
         const secret = await this.configService.get('JWT_SECRET_KEY');
         try {
             const verified = this.jwtService.verify(dto.refreshToken, {secret: secret});
-            const user = await this.userService.findOneByUserId(verified.sub);
+            const user = await this.userService.findOneByPhone(verified.sub);
 
             if (!user) {
                 throw new ForbiddenException('User not found');
@@ -34,7 +34,7 @@ export class TokenController {
                 throw new ForbiddenException('Invalid refresh token');
             }
 
-            const accessToken = this.jwtService.sign({sub: user.userId}, {expiresIn: '5s', secret: secret});
+            const accessToken = this.jwtService.sign({sub: user.phone}, {expiresIn: '5s', secret: secret});
             return {accessToken};
 
         } catch (error) {

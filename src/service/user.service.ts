@@ -32,28 +32,15 @@ export class UserService {
         return this.userRepository.findOneBy({ id });
     }
 
-    findOneByUserId(userId: string): Promise<User | null> {
-        return this.userRepository.findOneBy({ userId });
-    }
-
     findOneByPhone(phone: string): Promise<User | null> {
         return this.userRepository.findOneBy({ phone });
     }
 
     async create(dto: CreateUserDto): Promise<void> {
-        if (dto.provider === 'kakao') {
-            dto.isActive = false
-        } else {
-            dto.password = await this.hashPassword(dto.password)
-        }
         await this.userRepository.save(dto);
     }
 
     async update(id: number, dto: UpdateUserDto): Promise<void> {
-        const profileImage = await this.fileService.findOne(id, 'profileImage')
-        if (!!profileImage.url && !!dto.gender && !!dto.age) {
-            dto.isActive = true
-        }
         await this.userRepository.update(id, dto)
     }
 

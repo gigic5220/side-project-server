@@ -9,6 +9,8 @@ import {JwtModule} from "@nestjs/jwt";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import {UserService} from "../service/user.service";
 import {TokenModule} from "./token.module";
+import {VerifyService} from "../service/verify.service";
+import {TwilioService} from "../service/twilio.service";
 
 @Module({
     imports: [
@@ -25,6 +27,6 @@ import {TokenModule} from "./token.module";
         TokenModule
     ],
     controllers: [FileController],
-    providers: [FileService, AuthService, UserService]
+    providers: [FileService, AuthService, UserService, VerifyService, TwilioService]
 })
 export class FileModule {}

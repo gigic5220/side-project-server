@@ -1,11 +1,12 @@
 import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {LoginRequestDto} from "../dto/loginRequest.dto";
 import {JwtService} from "@nestjs/jwt";
-import { UserService } from '../service/user.service';
+import {UserService} from '../service/user.service';
 import {TokenService} from "../service/token.service";
 import {ConfigService} from "@nestjs/config";
-import { Request } from 'express';
+import {Request} from 'express';
 import {User} from "../entity/user.entity";
+import {VerifyService} from "../service/verify.service";
 
 @Injectable()
 export class AuthService {
@@ -14,30 +15,29 @@ export class AuthService {
         private userService: UserService,
         private tokenService: TokenService,
         private readonly configService: ConfigService,
+        private verifyService: VerifyService,
     ) {}
 
     async getUserFromAccessToken(request: Request): Promise<User> {
         const accessToken = request.headers['authorization']?.replace('Bearer ','');
         const secret = await this.configService.get('JWT_SECRET_KEY');
         const verifiedAccessToken = this.jwtService.verify(accessToken, {secret: secret});
-        const user = await this.userService.findOneByUserId(verifiedAccessToken.sub)
-        delete user.password
-        return user
+        return await this.userService.findOneByPhone(verifiedAccessToken.sub)
     }
 
     async jwtLogin(dto: LoginRequestDto) {
-        const user = await this.userService.findOneByUserId(dto.userId);
+        const user = await this.userService.findOneByPhone(dto.phone);
         if (!user) {
             throw new UnauthorizedException('아이디와 비밀번호를 확인해 주세요');
         }
         if (dto.provider !== 'kakao') {
-            const isPasswordMatch = await this.userService.comparePasswords(dto.password, user.password)
+            const isPasswordMatch = await this.verifyService.checkVerifyNumber(dto.phone, dto.code)
             if (!isPasswordMatch) {
                 throw new UnauthorizedException('아이디와 비밀번호를 확인해 주세요');
             }
         }
-        const accessTokenPayload = { sub: user.userId, type: 'access' };
-        const refreshTokenPayload = { sub: user.userId, type: 'refresh' };
+        const accessTokenPayload = { sub: user.phone, type: 'access' };
+        const refreshTokenPayload = { sub: user.phone, type: 'refresh' };
 
         const accessToken = this.jwtService.sign(accessTokenPayload,{ expiresIn: '1d', secret: this.configService.get('JWT_SECRET_KEY') });
 
@@ -53,8 +53,7 @@ export class AuthService {
 
         return {
             id: user.id,
-            userId: user.userId,
-            isActive: user.isActive,
+            phone: user.phone,
             accessToken: accessToken,
             accessTokenExpireAt: accessTokenExpireAt,
             refreshToken: refreshToken,

@@ -7,6 +7,8 @@ import {JwtModule, JwtService} from "@nestjs/jwt";
 import {UserModule} from "../module/user.module";
 import {TokenService} from "../service/token.service";
 import {TokenModule} from "../module/token.module";
+import {VerifyService} from "../service/verify.service";
+import {TwilioService} from "../service/twilio.service";
 
 @Module({
   imports: [
@@ -23,7 +25,7 @@ import {TokenModule} from "../module/token.module";
     forwardRef(() => UserModule),
       TokenModule
   ],
-  providers: [TokenService, AuthService, JwtStrategy, JwtService],
+  providers: [TokenService, AuthService, JwtStrategy, JwtService, VerifyService, TwilioService],
   exports: [AuthService, JwtService, JwtModule],
 })
 export class AuthModule {}
