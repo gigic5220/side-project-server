@@ -13,7 +13,7 @@ export class File {
     @Column()
     url: string;
 
-    @ManyToOne(() => User, user => user.refreshTokens)
+    @ManyToOne(() => User)
     @JoinColumn({ name: 'userId' })
     user: User;
 
