@@ -23,17 +23,10 @@ export class Group {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToMany(() => User)
-    @JoinTable({
-        name: 'group_user_associations',
-        joinColumn: {
-            name: 'groupId',
-            referencedColumnName: 'id'
-        },
-        inverseJoinColumn: {
-            name: 'userId',
-            referencedColumnName: 'id'
-        }
-    })
-    participants: User[];
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'userId' })
+    user: User;
+
+    @Column()
+    userId: number;
 }

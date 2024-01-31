@@ -14,6 +14,8 @@ import { UploadModule } from './module/upload.module';
 import { FileModule } from './module/file.module';
 import {GroupModule} from "./module/group.module";
 import {Group} from "./entity/group.entity";
+import {GroupUserAssociation} from "./entity/groupUserAssociation.entity";
+import {GroupUserAssociationModule} from "./module/groupUserAssociation.module";
 
 @Module({
   imports: [
@@ -30,7 +32,7 @@ import {Group} from "./entity/group.entity";
               username: configService.get('DATABASE_USERNAME'),
               password: configService.get('DATABASE_PASSWORD'),
               database: configService.get('DATABASE_NAME'),
-              entities: [User, RefreshToken, File, Group],
+              entities: [User, RefreshToken, File, Group, GroupUserAssociation],
               synchronize: true,
               logging: true,
           }),
@@ -43,6 +45,7 @@ import {Group} from "./entity/group.entity";
       UploadModule,
       FileModule,
       GroupModule,
+      GroupUserAssociationModule
   ],
   controllers: [AppController],
   providers: [AppService],

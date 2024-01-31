@@ -15,7 +15,4 @@ export class User {
 
     @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
     refreshTokens: RefreshToken[];
-
-    @ManyToMany(() => Group, group => group.participants)
-    groups: Group[];
 }

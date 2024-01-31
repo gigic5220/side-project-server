@@ -2,32 +2,32 @@ import {Body, Controller, Get, InternalServerErrorException, Post, Req} from '@n
 import {AuthService} from "../auth/auth.service";
 import {Request} from "express";
 import {GroupService} from "../service/group.service";
+import {Group} from "../entity/group.entity";
 import {CreateGroupDto} from "../dto/createGroup.dto";
 import {GroupUserAssociationService} from "../service/groupUserAssociation.service";
 import {CreateGroupUserAssociationDto} from "../dto/createGroupUserAssociation.dto";
+import {GroupUserAssociation} from "../entity/groupUserAssociation.entity";
 
-@Controller('/group')
-export class GroupController {
+@Controller('/groupUserAssociation')
+export class GroupUserAssociationController {
     constructor(
-        private readonly groupService: GroupService,
         private readonly groupUserAssociationService: GroupUserAssociationService,
         private readonly authService: AuthService,
     ) {}
 
     //@UseGuards(AuthGuard('jwt'))
+    @Get()
+    async getList(@Req() request: Request): Promise<GroupUserAssociation[]> {
+        const user = await this.authService.getUserFromAccessToken(request)
+        return await this.groupUserAssociationService.getList(user?.id)
+    }
+
+    //@UseGuards(AuthGuard('jwt'))
     @Post()
-    async create(@Body() createGroupDto: CreateGroupDto, @Req() request: Request): Promise<void>{
+    async create(@Body() createGroupDto: CreateGroupUserAssociationDto, @Req() request: Request): Promise<void>{
         try {
             const user = await this.authService.getUserFromAccessToken(request)
-            createGroupDto.userId = user?.id
-            const group = await this.groupService.create(createGroupDto)
-            const createGroupUserAssociationDto: CreateGroupUserAssociationDto = {
-                groupId: group.id,
-                userId: group.userId,
-                nickName: createGroupDto.nickName,
-                fileUrl: createGroupDto.fileUrl
-            }
-            await this.groupUserAssociationService.create(createGroupUserAssociationDto)
+            await this.groupUserAssociationService.create(createGroupDto)
         } catch (error) {
             throw new InternalServerErrorException('서버오류입니다');
         }
