@@ -5,4 +5,5 @@ export class CreateGroupDto {
     userId: number;
     nickName: string;
     fileUrl: string;
+    code: string;
 }

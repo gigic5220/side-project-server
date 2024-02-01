@@ -17,6 +17,9 @@ export class Group {
     @Column()
     name: string;
 
+    @Column({unique: true})
+    code: string;
+
     @CreateDateColumn()
     createdAt: Date;
 
