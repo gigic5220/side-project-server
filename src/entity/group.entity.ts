@@ -5,9 +5,10 @@ import {
     ManyToOne,
     JoinColumn,
     CreateDateColumn,
-    UpdateDateColumn, JoinTable, ManyToMany
+    UpdateDateColumn, JoinTable, ManyToMany, DeleteDateColumn, OneToMany
 } from 'typeorm';
 import {User} from "./user.entity";
+import {GroupUserAssociation} from "./groupUserAssociation.entity";
 
 @Entity()
 export class Group {
@@ -32,4 +33,10 @@ export class Group {
 
     @Column()
     userId: number;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
+
+    @OneToMany(() => GroupUserAssociation, groupUserAssociation => groupUserAssociation.group)
+    groupUserAssociations: GroupUserAssociation[];
 }
