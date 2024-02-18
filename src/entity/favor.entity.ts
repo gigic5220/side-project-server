@@ -10,17 +10,18 @@ import {
 import {User} from "./user.entity";
 import {GroupUserAssociation} from "./groupUserAssociation.entity";
 import {FavorUserAssociation} from "./favorUserAssociation.entity";
+import {Group} from "./group.entity";
 
 @Entity()
-export class Group {
+export class Favor {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    name: string;
+    title: string;
 
-    @Column({unique: true})
-    code: string;
+    @Column()
+    detail: string;
 
     @CreateDateColumn()
     createdAt: Date;
@@ -29,17 +30,21 @@ export class Group {
     updatedAt: Date;
 
     @ManyToOne(() => User)
-    @JoinColumn({ name: 'userId' })
+    @JoinColumn({ name: 'creatorId' })
     user: User;
 
+    @ManyToOne(() => Group)
+    @JoinColumn({ name: 'groupId' })
+    group: Group;
+
     @Column()
-    userId: number;
+    creatorId: number;
+
+    @Column()
+    groupId: number;
 
     @DeleteDateColumn()
     deletedAt: Date;
-
-    @OneToMany(() => GroupUserAssociation, groupUserAssociation => groupUserAssociation.group)
-    groupUserAssociations: GroupUserAssociation[];
 
     @OneToMany(() => FavorUserAssociation, favorUserAssociation => favorUserAssociation.favor)
     favorUserAssociations: FavorUserAssociation[];

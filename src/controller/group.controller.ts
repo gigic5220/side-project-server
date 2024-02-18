@@ -71,9 +71,12 @@ export class GroupController {
     }
 
     @UseGuards(AuthGuard('jwt'))
-    @Put('/delete/:id')
+    @Delete('/delete/:id')
     async softDelete(@Param('id') id: number): Promise<void> {
         await this.groupService.softDelete(id)
+        const groupUserAssociation = await this.groupUserAssociationService.findOne({groupId: id})
+        console.log('groupUserAssociation', groupUserAssociation);
+        await this.groupUserAssociationService.softDelete(groupUserAssociation.id)
     }
 
     @UseGuards(AuthGuard('jwt'))

@@ -9,31 +9,33 @@ import {
 } from 'typeorm';
 import {User} from "./user.entity";
 import {Group} from "./group.entity";
+import {Favor} from "./favor.entity";
 
 @Entity()
-export class GroupUserAssociation {
+export class FavorUserAssociation {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @ManyToOne(() => Favor, favor => favor.id)
+    @JoinColumn({ name: 'favorId' })
+    favor: Favor;
+
     @Column()
-    groupId: number;
+    favorId: number;
+
+    @ManyToOne(() => User, user => user.id)
+    @JoinColumn({ name: 'userId' })
+    user: User;
 
     @Column()
     userId: number;
-
-    @Column()
-    nickName: string;
-
-    @Column({ nullable: true })
-    fileUrl: string;
 
     @ManyToOne(() => Group, group => group.id)
     @JoinColumn({ name: 'groupId' })
     group: Group;
 
-    @ManyToOne(() => User, user => user.id)
-    @JoinColumn({ name: 'userId' })
-    user: User;
+    @Column()
+    groupId: number;
 
     @CreateDateColumn()
     createdAt: Date;

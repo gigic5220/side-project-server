@@ -16,6 +16,10 @@ import {GroupModule} from "./module/group.module";
 import {Group} from "./entity/group.entity";
 import {GroupUserAssociation} from "./entity/groupUserAssociation.entity";
 import {GroupUserAssociationModule} from "./module/groupUserAssociation.module";
+import {FavorUserAssociation} from "./entity/favorUserAssociation.entity";
+import {Favor} from "./entity/favor.entity";
+import {FavorUserAssociationModule} from "./module/favorUserAssociation.module";
+import {FavorModule} from "./module/favor.module";
 
 @Module({
   imports: [
@@ -32,7 +36,7 @@ import {GroupUserAssociationModule} from "./module/groupUserAssociation.module";
               username: configService.get('DATABASE_USERNAME'),
               password: configService.get('DATABASE_PASSWORD'),
               database: configService.get('DATABASE_NAME'),
-              entities: [User, RefreshToken, File, Group, GroupUserAssociation],
+              entities: [User, RefreshToken, File, Group, GroupUserAssociation, Favor, FavorUserAssociation],
               synchronize: true,
               logging: true,
           }),
@@ -45,7 +49,9 @@ import {GroupUserAssociationModule} from "./module/groupUserAssociation.module";
       UploadModule,
       FileModule,
       GroupModule,
-      GroupUserAssociationModule
+      GroupUserAssociationModule,
+      FavorModule,
+      FavorUserAssociationModule
   ],
   controllers: [AppController],
   providers: [AppService],

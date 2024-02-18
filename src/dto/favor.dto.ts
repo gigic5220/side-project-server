@@ -1,0 +1,46 @@
+import {Favor} from "../entity/favor.entity";
+import {FavorUserAssociation} from "../entity/favorUserAssociation.entity";
+import {GroupUserAssociation} from "../entity/groupUserAssociation.entity";
+
+class GroupUserAssociationDto {
+    id: number;
+    userId: number;
+    groupId: number;
+    nickName: string;
+    fileUrl: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+class FavorUserAssociationDto {
+    id: number;
+    userId: number;
+    groupId: number;
+    favorId: number;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export class FavorDto {
+    id: number;
+    title: string;
+    detail: string;
+    createdAt: Date;
+    updatedAt: Date;
+    groupId: number;
+    creatorId: number;
+    favorUserAssociationList: FavorUserAssociation[];
+    groupUserAssociation?: GroupUserAssociation; // Optional, 특정 조건에 따라 존재할 수 있음
+
+    constructor(favor: Favor, groupUserAssociation?: GroupUserAssociation) {
+        this.id = favor.id;
+        this.title = favor.title;
+        this.detail = favor.detail;
+        this.createdAt = favor.createdAt;
+        this.updatedAt = favor.updatedAt;
+        this.groupId = favor.groupId;
+        this.creatorId = favor.creatorId;
+        this.favorUserAssociationList = favor.favorUserAssociations;
+        this.groupUserAssociation = groupUserAssociation;
+    }
+}
