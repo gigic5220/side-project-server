@@ -23,6 +23,9 @@ export class Favor {
     @Column()
     detail: string;
 
+    @Column({type: 'boolean'})
+    isImportant: boolean;
+
     @CreateDateColumn()
     createdAt: Date;
 

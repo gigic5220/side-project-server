@@ -2,29 +2,11 @@ import {Favor} from "../entity/favor.entity";
 import {FavorUserAssociation} from "../entity/favorUserAssociation.entity";
 import {GroupUserAssociation} from "../entity/groupUserAssociation.entity";
 
-class GroupUserAssociationDto {
-    id: number;
-    userId: number;
-    groupId: number;
-    nickName: string;
-    fileUrl: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-class FavorUserAssociationDto {
-    id: number;
-    userId: number;
-    groupId: number;
-    favorId: number;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
 export class FavorDto {
     id: number;
     title: string;
     detail: string;
+    isImportant: boolean;
     createdAt: Date;
     updatedAt: Date;
     groupId: number;
@@ -36,6 +18,7 @@ export class FavorDto {
         this.id = favor.id;
         this.title = favor.title;
         this.detail = favor.detail;
+        this.isImportant = favor.isImportant;
         this.createdAt = favor.createdAt;
         this.updatedAt = favor.updatedAt;
         this.groupId = favor.groupId;

@@ -6,7 +6,7 @@ import {
     InternalServerErrorException,
     Param,
     Post,
-    Put,
+    Put, Query,
     Req,
     UseGuards
 } from '@nestjs/common';
@@ -69,7 +69,8 @@ export class FavorController {
         const user = await this.authService.getUserFromAccessToken(request)
         const newUpdateFavorDto: UpdateFavorDto = {
             title: updateFavorDto.title,
-            detail: updateFavorDto.detail
+            detail: updateFavorDto.detail,
+            isImportant: updateFavorDto.isImportant,
         }
         await this.favorService.update(id, newUpdateFavorDto)
 
@@ -114,10 +115,10 @@ export class FavorController {
 
     @UseGuards(AuthGuard('jwt'))
     @Get('/me')
-    async getMyList(@Req() request: Request): Promise<FavorDto[]>{
+    async getMyList(@Req() request: Request, @Query('type') type: string): Promise<FavorDto[]>{
         try {
             const user = await this.authService.getUserFromAccessToken(request)
-            return await this.favorService.getMyList(user?.id)
+            return await this.favorService.getMyList(type, user?.id)
         } catch (error) {
             console.log(error);
             throw new InternalServerErrorException('서버오류입니다');

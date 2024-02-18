@@ -42,13 +42,12 @@ export class FavorService {
         await this.favorRepository.delete(id)
     }
 
-    async getMyList(userId: number): Promise<FavorDto[]> {
-        const favorList = await this.favorRepository
+    async getMyList(type: string, userId: number): Promise<FavorDto[]> {
+        let queryBuilder = this.favorRepository
             .createQueryBuilder("favor")
             .leftJoinAndSelect("favor.favorUserAssociations", "favorUserAssociation")
             .leftJoinAndSelect("favorUserAssociation.user", "user")
-            .where("favorUserAssociation.userId = :userId", { userId })
-            .andWhere("favor.deletedAt IS NULL")
+            .where("favor.deletedAt IS NULL")
             .select([
                 "favor.id",
                 "favor.title",
@@ -57,24 +56,39 @@ export class FavorService {
                 "favor.updatedAt",
                 "favor.groupId",
                 "favor.creatorId",
+                "favor.isImportant",
                 "favorUserAssociation.id",
                 "favorUserAssociation.userId",
                 "favorUserAssociation.favorId",
                 "favorUserAssociation.groupId",
                 "favorUserAssociation.createdAt",
                 "favorUserAssociation.updatedAt",
-            ])
-            .getMany();
+            ]);
 
-        // FavorDto[]를 생성하기 위한 결과 배열
+        if (type === 'received') {
+            queryBuilder = queryBuilder.andWhere("favorUserAssociation.userId = :userId", { userId });
+        } else if (type === 'sent') {
+            queryBuilder = queryBuilder
+                .andWhere("favorUserAssociation.userId != :userId", { userId })
+                .andWhere("favor.creatorId = :userId", { userId });
+        }
+
+        const favorList = await queryBuilder.getMany();
+
         const favorDtoList: FavorDto[] = [];
 
         for (const favor of favorList) {
+            let currentUserId : number;
+            if (type === 'received') {
+                currentUserId = favor.creatorId;
+            } else {
+                currentUserId = userId;
+            }
+
             const groupUserAssociation = await this.groupUserAssociationRepository.findOne({
                 where: { groupId: favor.groupId, userId: userId }
             });
 
-            // GroupUserAssociation 정보를 바탕으로 FavorDto 인스턴스 생성
             const favorDto = new FavorDto(favor, groupUserAssociation);
             favorDtoList.push(favorDto);
 
