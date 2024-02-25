@@ -60,6 +60,7 @@ export class FavorService {
                 "favorUserAssociation.id",
                 "favorUserAssociation.userId",
                 "favorUserAssociation.favorId",
+                "favorUserAssociation.isComplete",
                 "favorUserAssociation.groupId",
                 "favorUserAssociation.createdAt",
                 "favorUserAssociation.updatedAt",

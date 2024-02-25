@@ -41,6 +41,28 @@ export class GroupService {
             .getMany();
     }
 
+    async getList(inviteCode: string): Promise<Group[]> {
+        return this.groupRepository
+            .createQueryBuilder("group")
+            .leftJoinAndSelect("group.groupUserAssociations", "groupUserAssociation")
+            .where("group.code = :inviteCode", { inviteCode })
+            .andWhere("group.deletedAt IS NULL") // soft-deleted groups are excluded
+            .select([
+                "group.id",
+                "group.name",
+                "group.code",
+                "group.createdAt",
+                "group.updatedAt",
+                "groupUserAssociation.id",
+                "groupUserAssociation.userId",
+                "groupUserAssociation.nickName",
+                "groupUserAssociation.fileUrl",
+                "groupUserAssociation.createdAt",
+                "groupUserAssociation.updatedAt"
+            ])
+            .getMany();
+    }
+
     async getMy(id: number, userId: number): Promise<Group> {
         return this.groupRepository
             .createQueryBuilder("group")

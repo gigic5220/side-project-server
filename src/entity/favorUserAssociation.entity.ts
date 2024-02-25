@@ -37,6 +37,9 @@ export class FavorUserAssociation {
     @Column()
     groupId: number;
 
+    @Column({ default: false })
+    isComplete: boolean;
+
     @CreateDateColumn()
     createdAt: Date;
 

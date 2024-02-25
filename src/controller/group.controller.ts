@@ -6,7 +6,7 @@ import {
     InternalServerErrorException,
     Param,
     Post,
-    Put,
+    Put, Query,
     Req,
     UseGuards
 } from '@nestjs/common';
@@ -92,6 +92,17 @@ export class GroupController {
             const user = await this.authService.getUserFromAccessToken(request)
             console.log('user?.id', user?.id);
             return await this.groupService.getMyList(user?.id)
+        } catch (error) {
+            console.log(error);
+            throw new InternalServerErrorException('서버오류입니다');
+        }
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('/')
+    async getList(@Req() request: Request, @Query('inviteCode') inviteCode: string): Promise<Group[]>{
+        try {
+            return await this.groupService.getList(inviteCode)
         } catch (error) {
             console.log(error);
             throw new InternalServerErrorException('서버오류입니다');

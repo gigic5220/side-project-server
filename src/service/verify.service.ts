@@ -15,8 +15,9 @@ export class VerifyService {
         if (!phoneValidation.isValid) {
             throw new Error("invalid format of the phone.");
         }
-
-        return this.twilioService.sendVerificationCode({to: phoneValidation.phoneNumber})
+        // todo: test 전용 휴대폰 번호 제거 필요
+        return this.twilioService.sendVerificationCode({to: '+821030592130'})
+        //return this.twilioService.sendVerificationCode({to: phoneValidation.phoneNumber})
     }
 
     checkVerifyNumber(phoneNumber: string, code: string):  Promise<VerificationCheckInstance> {
@@ -24,7 +25,8 @@ export class VerifyService {
         if (!phoneValidation.isValid) {
             throw new Error("invalid format of the phone.");
         }
-
-        return this.twilioService.checkVerificationCode({to: phoneValidation.phoneNumber, code: code})
+        // todo: test 전용 휴대폰 번호 제거 필요
+        return this.twilioService.checkVerificationCode({to: '+821030592130', code: code})
+        //return this.twilioService.checkVerificationCode({to: phoneValidation.phoneNumber, code: code})
     }
 }
