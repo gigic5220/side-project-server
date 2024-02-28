@@ -20,6 +20,10 @@ import {FavorUserAssociation} from "./entity/favorUserAssociation.entity";
 import {Favor} from "./entity/favor.entity";
 import {FavorUserAssociationModule} from "./module/favorUserAssociation.module";
 import {FavorModule} from "./module/favor.module";
+import {GroupJoinRequest} from "./entity/groupJoinRequest.entity";
+import {GroupJoinRequestModule} from "./module/groupJoinRequest.module";
+import {Notification} from "./entity/notification.entity";
+import {NotificationModule} from "./module/notification.module";
 
 @Module({
   imports: [
@@ -36,7 +40,17 @@ import {FavorModule} from "./module/favor.module";
               username: configService.get('DATABASE_USERNAME'),
               password: configService.get('DATABASE_PASSWORD'),
               database: configService.get('DATABASE_NAME'),
-              entities: [User, RefreshToken, File, Group, GroupUserAssociation, Favor, FavorUserAssociation],
+              entities: [
+                  User,
+                  RefreshToken,
+                  File,
+                  Group,
+                  GroupUserAssociation,
+                  Favor,
+                  FavorUserAssociation,
+                  GroupJoinRequest,
+                  Notification
+              ],
               synchronize: true,
               logging: true,
           }),
@@ -51,7 +65,9 @@ import {FavorModule} from "./module/favor.module";
       GroupModule,
       GroupUserAssociationModule,
       FavorModule,
-      FavorUserAssociationModule
+      FavorUserAssociationModule,
+      GroupJoinRequestModule,
+      NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
