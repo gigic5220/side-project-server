@@ -25,19 +25,19 @@ export class Notification {
     userId: number;
 
     @Column()
-    message: string;
-
-    @Column()
     type: string;
 
     @Column({default: false})
     isRead: boolean;
 
-    @Column()
+    @Column({ nullable: true })
     parameterId: number;
 
-    @Column()
+    @Column({ nullable: true })
     parameterText: string;
+
+    @Column({ nullable: true })
+    parameterImage: string;
 
     @CreateDateColumn()
     createdAt: Date;

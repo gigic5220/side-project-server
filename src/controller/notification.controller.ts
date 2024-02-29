@@ -13,7 +13,6 @@ import {Request} from "express";
 import {AuthGuard} from "@nestjs/passport";
 import {GroupJoinRequest} from "../entity/groupJoinRequest.entity";
 import {NotificationService} from "../service/notification.service";
-import {UpdateNotificationDto} from "../dto/updateNotification.dto";
 import {CreateNotificationDto} from "../dto/createNotification.dto";
 import {NotificationCountDto} from "../dto/notificationCount.dto";
 import {Notification} from "../entity/notification.entity";
@@ -63,7 +62,13 @@ export class NotificationController {
 
     @UseGuards(AuthGuard('jwt'))
     @Put(':id')
-    async update(@Param('id') id: number, @Body() updateNotificationDto: UpdateNotificationDto): Promise<void> {
-        await this.notificationService.update(id, updateNotificationDto);
+    async update(@Param('id') id: number): Promise<void> {
+        await this.notificationService.update(id);
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post('/read/:id')
+    async read(@Param('id') id: number): Promise<void> {
+        await this.notificationService.update(id);
     }
 }

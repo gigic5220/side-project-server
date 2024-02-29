@@ -3,7 +3,6 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {Repository, UpdateResult} from 'typeorm';
 import {Notification} from "../entity/notification.entity";
 import {CreateNotificationDto} from "../dto/createNotification.dto";
-import {UpdateNotificationDto} from "../dto/updateNotification.dto";
 
 @Injectable()
 export class NotificationService {
@@ -16,8 +15,9 @@ export class NotificationService {
         return await this.notificationRepository.save(createNotificationDto);
     }
 
-    async update(id: number, updateNotificationDto: UpdateNotificationDto): Promise<UpdateResult> {
-        return await this.notificationRepository.update(id, updateNotificationDto);
+    async update(id: number): Promise<UpdateResult> {
+        console.log('update', id)
+        return await this.notificationRepository.update(id, {isRead: true});
     }
 
     async softDelete(id: number): Promise<void> {
@@ -29,10 +29,10 @@ export class NotificationService {
     }
 
     async getMyList(userId: number): Promise<Notification[]> {
-        return await this.notificationRepository.findBy({userId})
+        return await this.notificationRepository.findBy({userId, isRead: false})
     }
 
     async getMyListCount(userId: number): Promise<number> {
-        return await this.notificationRepository.count({where: {userId}})
+        return await this.notificationRepository.count({where: {userId, isRead: false}})
     }
 }

@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller,
+    Controller, Delete,
     Get,
     InternalServerErrorException, Param,
     Post, Put,
@@ -18,7 +18,6 @@ import {UpdateGroupJoinRequestDto} from "../dto/updateGroupJoinRequest.dto";
 import {NotificationService} from "../service/notification.service";
 import {CreateNotificationDto} from "../dto/createNotification.dto";
 import {GroupService} from "../service/group.service";
-import {NotificationCountDto} from "../dto/notificationCount.dto";
 
 @Controller('/groupJoinRequest')
 export class GroupJoinRequestController {
@@ -39,11 +38,10 @@ export class GroupJoinRequestController {
             const group = await this.groupService.findOne(createGroupJoinRequestDto.groupId)
             const createNotificationDto: CreateNotificationDto = {
                 userId: group.userId,
-                //message: `'${group?.name}' 그룹에 '${createGroupJoinRequestDto.nickName}' 님께서 가입을 요청했어요. 요청을 수락할까요?`,
-                message: `'{param}' 그룹에 '{param}' 님께서 가입을 요청했어요. 요청을 수락할까요?`,
                 type: 'groupJoinRequest',
                 parameterId: groupJoinRequest.id,
-                parameterText: `${group?.name},${createGroupJoinRequestDto.nickName}`
+                parameterText: `${createGroupJoinRequestDto.nickName},${group?.name}`,
+                parameterImage: createGroupJoinRequestDto.fileUrl,
             }
             await this.notificationService.create(createNotificationDto)
         } catch (error) {
@@ -62,11 +60,14 @@ export class GroupJoinRequestController {
         }
     }
 
-
-
     @UseGuards(AuthGuard('jwt'))
     @Put(':id')
     async update(@Param('id') id: number, @Body() updateGroupJoinRequestDto: UpdateGroupJoinRequestDto): Promise<void> {
         await this.groupJoinRequestService.update(id, updateGroupJoinRequestDto);
+    }
+
+    @Delete(':id')
+    async delete(@Param('id') id: number): Promise<void> {
+        await this.groupJoinRequestService.softDelete(id)
     }
 }
