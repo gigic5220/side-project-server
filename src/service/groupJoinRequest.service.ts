@@ -29,6 +29,11 @@ export class GroupJoinRequestService {
         await this.groupJoinRequestRepository.delete(id)
     }
 
+    async get(id: number): Promise<GroupJoinRequest | undefined> {
+        return await this.groupJoinRequestRepository.findOne({where: {id}});
+    }
+
+
     async getMyList(userId: number): Promise<any> {
         const joinRequests = await this.groupJoinRequestRepository
             .createQueryBuilder("groupJoinRequest")

@@ -40,6 +40,15 @@ export class FavorUserAssociation {
     @Column({ default: false })
     isComplete: boolean;
 
+    @Column({ default: false })
+    isCreator: boolean;
+
+    @Column()
+    nickName: string;
+
+    @Column({ nullable: true })
+    fileUrl: string;
+
     @CreateDateColumn()
     createdAt: Date;
 

@@ -20,8 +20,8 @@ export class FavorUserAssociationService {
         return this.favorUserAssociationRepository.find({ where: params, order: { id: 'DESC'} });
     }
 
-    async create(createFavorUserAssociationDto: CreateFavorUserAssociationDto): Promise<void> {
-        await this.favorUserAssociationRepository.save(createFavorUserAssociationDto);
+    async create(createFavorUserAssociationDto: CreateFavorUserAssociationDto): Promise<FavorUserAssociation> {
+        return await this.favorUserAssociationRepository.save(createFavorUserAssociationDto);
     }
 
     async update(id: number, updateFavorUserAssociationDto: UpdateFavorUserAssociationDto): Promise<void> {

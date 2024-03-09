@@ -20,24 +20,17 @@ export class GroupService {
     }
 
     async getMyList(userId: number): Promise<Group[]> {
-        return this.groupRepository
-            .createQueryBuilder("group")
-            .leftJoinAndSelect("group.groupUserAssociations", "groupUserAssociation")
-            .where("groupUserAssociation.userId = :userId", { userId })
-            .andWhere("group.deletedAt IS NULL") // soft-deleted groups are excluded
-            .select([
-                "group.id",
-                "group.name",
-                "group.code",
-                "group.createdAt",
-                "group.updatedAt",
-                "groupUserAssociation.id",
-                "groupUserAssociation.userId",
-                "groupUserAssociation.nickName",
-                "groupUserAssociation.fileUrl",
-                "groupUserAssociation.createdAt",
-                "groupUserAssociation.updatedAt"
-            ])
+        const groupUserAssociations = await this.groupUserAssociationRepository.find({
+            where: { userId: userId },
+        });
+
+        const groupIdList = groupUserAssociations.map(groupUserAssociation => groupUserAssociation.groupId);
+
+        return await this.groupRepository
+            .createQueryBuilder('group')
+            .leftJoinAndSelect('group.groupUserAssociations', 'association')
+            .leftJoinAndSelect('association.user', 'user')
+            .where('group.id IN (:...groupIdList)', { groupIdList })
             .getMany();
     }
 
@@ -68,7 +61,6 @@ export class GroupService {
             .createQueryBuilder("group")
             .leftJoinAndSelect("group.groupUserAssociations", "groupUserAssociation")
             .where("group.id = :id", { id })
-            .andWhere("groupUserAssociation.userId = :userId", { userId })
             .andWhere("group.deletedAt IS NULL") // soft-deleted groups are excluded
             .select([
                 "group.id",

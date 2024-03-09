@@ -18,11 +18,14 @@ import {UpdateGroupJoinRequestDto} from "../dto/updateGroupJoinRequest.dto";
 import {NotificationService} from "../service/notification.service";
 import {CreateNotificationDto} from "../dto/createNotification.dto";
 import {GroupService} from "../service/group.service";
+import {GroupUserAssociationService} from "../service/groupUserAssociation.service";
+import {CreateGroupUserAssociationDto} from "../dto/createGroupUserAssociation.dto";
 
 @Controller('/groupJoinRequest')
 export class GroupJoinRequestController {
     constructor(
         private readonly groupJoinRequestService: GroupJoinRequestService,
+        private readonly groupUserAssociationService: GroupUserAssociationService,
         private readonly notificationService: NotificationService,
         private readonly groupService: GroupService,
         private readonly authService: AuthService,
@@ -60,14 +63,21 @@ export class GroupJoinRequestController {
         }
     }
 
-    @UseGuards(AuthGuard('jwt'))
-    @Put(':id')
-    async update(@Param('id') id: number, @Body() updateGroupJoinRequestDto: UpdateGroupJoinRequestDto): Promise<void> {
-        await this.groupJoinRequestService.update(id, updateGroupJoinRequestDto);
-    }
-
     @Delete(':id')
     async delete(@Param('id') id: number): Promise<void> {
         await this.groupJoinRequestService.softDelete(id)
+    }
+
+    @Post('/accept/:id')
+    async accept(@Param('id') id: number, @Body() updateGroupJoinRequestDto: UpdateGroupJoinRequestDto): Promise<void> {
+        await this.groupJoinRequestService.update(id, updateGroupJoinRequestDto)
+        const groupJoinRequest = await this.groupJoinRequestService.get(id)
+        const createGroupUserAssociationDto: CreateGroupUserAssociationDto = {
+            userId: groupJoinRequest?.userId,
+            groupId: groupJoinRequest?.groupId,
+            nickName: groupJoinRequest?.nickName,
+            fileUrl: groupJoinRequest?.fileUrl,
+        }
+        await this.groupUserAssociationService.create(createGroupUserAssociationDto)
     }
 }

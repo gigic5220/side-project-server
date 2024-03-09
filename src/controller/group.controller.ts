@@ -90,7 +90,6 @@ export class GroupController {
     async getMyList(@Req() request: Request): Promise<Group[]>{
         try {
             const user = await this.authService.getUserFromAccessToken(request)
-            console.log('user?.id', user?.id);
             return await this.groupService.getMyList(user?.id)
         } catch (error) {
             console.log(error);

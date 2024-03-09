@@ -1,4 +1,3 @@
 export class UpdateFavorUserAssociationDto {
-    groupId?: number;
-    userId?: number;
+    isComplete: boolean;
 }

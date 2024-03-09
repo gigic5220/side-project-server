@@ -1,7 +1,7 @@
 export class CreateNotificationDto {
     userId: number;
     type: string;
-    parameterId: number;
+    parameterId?: number;
     parameterText: string;
-    parameterImage: string;
+    parameterImage?: string;
 }

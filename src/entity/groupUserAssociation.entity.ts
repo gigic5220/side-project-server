@@ -5,7 +5,7 @@ import {
     ManyToOne,
     JoinColumn,
     CreateDateColumn,
-    UpdateDateColumn, DeleteDateColumn
+    UpdateDateColumn, DeleteDateColumn, ManyToMany
 } from 'typeorm';
 import {User} from "./user.entity";
 import {Group} from "./group.entity";

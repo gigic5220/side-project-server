@@ -1,7 +1,7 @@
 import {
     Body,
     ConflictException,
-    Controller,
+    Controller, Delete,
     Get,
     InternalServerErrorException,
     Param,
@@ -61,10 +61,15 @@ export class UserController {
     logIn(@Body() data: LoginRequestDto) {
         return this.authService.jwtLogin(data);
     }
+
     @UseGuards(JwtAuthGuard)
     @Get('/current')
     async getCurrentUser(@Req() request: Request): Promise<User> {
         return await this.authService.getUserFromAccessToken(request)
     }
 
+    @Delete(':id')
+    async delete(@Param('id') id: number): Promise<void> {
+        return await this.userService.delete(id);
+    }
 }

@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany} from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, DeleteDateColumn} from 'typeorm';
 import {RefreshToken} from "./refreshToken.entity";
 import {Group} from "./group.entity";
 
@@ -15,4 +15,7 @@ export class User {
 
     @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
     refreshTokens: RefreshToken[];
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 }

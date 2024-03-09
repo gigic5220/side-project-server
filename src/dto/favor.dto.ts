@@ -12,9 +12,9 @@ export class FavorDto {
     groupId: number;
     creatorId: number;
     favorUserAssociationList: FavorUserAssociation[];
-    groupUserAssociation?: GroupUserAssociation; // Optional, 특정 조건에 따라 존재할 수 있음
+    groupUserAssociation?: GroupUserAssociation[];
 
-    constructor(favor: Favor, groupUserAssociation?: GroupUserAssociation) {
+    constructor(favor: Favor, groupUserAssociationList?: GroupUserAssociation[]) {
         this.id = favor.id;
         this.title = favor.title;
         this.detail = favor.detail;
@@ -24,6 +24,6 @@ export class FavorDto {
         this.groupId = favor.groupId;
         this.creatorId = favor.creatorId;
         this.favorUserAssociationList = favor.favorUserAssociations;
-        this.groupUserAssociation = groupUserAssociation;
+        this.groupUserAssociation = groupUserAssociationList;
     }
 }

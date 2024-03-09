@@ -31,10 +31,10 @@ export class AuthService {
             throw new UnauthorizedException('아이디와 비밀번호를 확인해 주세요');
         }
         if (dto.provider !== 'kakao') {
-            const isPasswordMatch = await this.verifyService.checkVerifyNumber(dto.phone, dto.code)
+            /*const isPasswordMatch = await this.verifyService.checkVerifyNumber(dto.phone, dto.code)
             if (!isPasswordMatch) {
                 throw new UnauthorizedException('아이디와 비밀번호를 확인해 주세요');
-            }
+            }*/
         }
         const accessTokenPayload = { sub: user.phone, type: 'access' };
         const refreshTokenPayload = { sub: user.phone, type: 'refresh' };

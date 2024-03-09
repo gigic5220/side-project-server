@@ -9,6 +9,7 @@ import {GroupService} from "../service/group.service";
 import {NotificationModule} from "./notification.module";
 import {GroupModule} from "./group.module";
 import {GroupUserAssociationModule} from "./groupUserAssociation.module";
+import {GroupUserAssociationService} from "../service/groupUserAssociation.service";
 
 @Module({
     imports: [
@@ -19,8 +20,8 @@ import {GroupUserAssociationModule} from "./groupUserAssociation.module";
         GroupUserAssociationModule
     ],
     controllers: [GroupJoinRequestController],
-    providers: [GroupJoinRequestService, NotificationService, GroupService],
-    exports: [GroupJoinRequestService, NotificationService, GroupService, TypeOrmModule]
+    providers: [GroupJoinRequestService, NotificationService, GroupService, GroupUserAssociationService],
+    exports: [GroupJoinRequestService, NotificationService, GroupService,GroupUserAssociationService, TypeOrmModule]
 })
 
 

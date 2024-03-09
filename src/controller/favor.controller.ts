@@ -1,7 +1,6 @@
 import {
     Body,
     Controller,
-    Delete,
     Get,
     InternalServerErrorException,
     Param,
@@ -13,30 +12,25 @@ import {
 import {AuthService} from "../auth/auth.service";
 import {Request} from "express";
 import {GroupService} from "../service/group.service";
-import {CreateGroupDto} from "../dto/createGroup.dto";
 import {GroupUserAssociationService} from "../service/groupUserAssociation.service";
-import {CreateGroupUserAssociationDto} from "../dto/createGroupUserAssociation.dto";
-import {UpdateUserDto} from "../dto/updateUser.dto";
-import {UpdateGroupDto} from "../dto/updateGroup.dto";
 import {AuthGuard} from "@nestjs/passport";
-import {Group} from "../entity/group.entity";
-import {UpdateGroupUserAssociationDto} from "../dto/updateGroupUserAssociation.dto";
-import {UpdateResult} from "typeorm";
-import {GroupUserAssociation} from "../entity/groupUserAssociation.entity";
 import {FavorService} from "../service/favor.service";
 import {FavorUserAssociationService} from "../service/favorUserAssociation.service";
 import {CreateFavorDto} from "../dto/createFavor.dto";
 import {CreateFavorUserAssociationDto} from "../dto/createFavorUserAssociation.dto";
 import {UpdateFavorDto} from "../dto/updateFavor.dto";
-import {UpdateFavorUserAssociationDto} from "../dto/updateFavorUserAssociation.dto";
 import {Favor} from "../entity/favor.entity";
-import {FavorDto} from "../dto/favor.dto";
+import {CreateNotificationDto} from "../dto/createNotification.dto";
+import {NotificationService} from "../service/notification.service";
 
 @Controller('/favor')
 export class FavorController {
     constructor(
         private readonly favorService: FavorService,
         private readonly favorUserAssociationService: FavorUserAssociationService,
+        private readonly groupUserAssociationService: GroupUserAssociationService,
+        private readonly groupService: GroupService,
+        private readonly notificationService: NotificationService,
         private readonly authService: AuthService,
     ) {}
 
@@ -47,17 +41,32 @@ export class FavorController {
             const user = await this.authService.getUserFromAccessToken(request)
             createFavorDto.creatorId = user?.id
             const favor = await this.favorService.create(createFavorDto)
-
-            const favorUserAssociationPromises = createFavorDto.userIdList.map(userId => {
+            createFavorDto.userIdList.push(user?.id);
+            const favorUserAssociationPromises = createFavorDto.userIdList.map(async (userId) => {
+                const groupUserAssociation = await this.groupUserAssociationService.findOne({groupId: createFavorDto.groupId, userId: userId})
                 const createFavorUserAssociationDto: CreateFavorUserAssociationDto = {
                     groupId: createFavorDto.groupId,
                     userId: userId,
-                    favorId: favor.id
+                    favorId: favor.id,
+                    isCreator: userId === user?.id,
+                    nickName: groupUserAssociation.nickName,
+                    fileUrl: groupUserAssociation.fileUrl
                 };
                 return this.favorUserAssociationService.create(createFavorUserAssociationDto);
             });
-
-            await Promise.all(favorUserAssociationPromises);
+            const favorUserAssociationList = await Promise.all(favorUserAssociationPromises);
+            const group = await this.groupService.findOne(createFavorDto.groupId)
+            const notificationPromises = favorUserAssociationList
+                .filter((favorUserAssociation) => !favorUserAssociation.isCreator)
+                .map(async (favorUserAssociation) => {
+                const createNotificationDto: CreateNotificationDto = {
+                    userId: favorUserAssociation.userId,
+                    type: 'favor',
+                    parameterText: `${group.name}`,
+                }
+                return this.notificationService.create(createNotificationDto);
+            });
+            await Promise.all(notificationPromises);
         } catch (error) {
             throw new InternalServerErrorException('서버오류입니다');
         }
@@ -88,10 +97,14 @@ export class FavorController {
             );
 
             if (!favorUserAssociation) {
+                const groupUserAssociation = await this.groupUserAssociationService.findOne({groupId: updateFavorDto.groupId, userId: userId})
                 const createFavorUserAssociationDto: CreateFavorUserAssociationDto = {
                     userId: userId,
                     groupId: updateFavorDto.groupId,
-                    favorId: id
+                    favorId: id,
+                    isCreator: userId === user?.id,
+                    nickName: groupUserAssociation.nickName,
+                    fileUrl: groupUserAssociation.fileUrl
                 };
                 // 생성해야 하는 작업을 Promises 배열에 추가
                 createPromises.push(this.favorUserAssociationService.create(createFavorUserAssociationDto));
@@ -115,10 +128,10 @@ export class FavorController {
 
     @UseGuards(AuthGuard('jwt'))
     @Get('/me')
-    async getMyList(@Req() request: Request, @Query('type') type: string): Promise<FavorDto[]>{
+    async getMyList(@Req() request: Request, @Query('type') type: string, @Query('groupId') groupId: number): Promise<Favor[]>{
         try {
             const user = await this.authService.getUserFromAccessToken(request)
-            return await this.favorService.getMyList(type, user?.id)
+            return await this.favorService.getMyList(type, user?.id, groupId)
         } catch (error) {
             console.log(error);
             throw new InternalServerErrorException('서버오류입니다');
